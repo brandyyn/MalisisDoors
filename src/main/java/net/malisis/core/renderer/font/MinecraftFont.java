@@ -35,7 +35,6 @@ import cpw.mods.fml.client.FMLClientHandler;
  */
 public class MinecraftFont extends MalisisFont {
 
-    private static final MethodHandle charWidthMethodHandle;
 
     private int[] mcCharWidth;
     private float[] optifineCharWidth;
@@ -52,17 +51,6 @@ public class MinecraftFont extends MalisisFont {
     // to change the obfuscated field name to just d, so need this
     // reflection instead of an AT.
     static {
-        try {
-            String srg = "field_78286_d";
-            if (FMLClientHandler.instance()
-                .hasOptifine()) srg = "d";
-            Field charWidthField = FontRenderer.class.getDeclaredField(MalisisCore.isObfEnv ? srg : "charWidth");
-            charWidthField.setAccessible(true);
-            charWidthMethodHandle = MethodHandles.lookup()
-                .unreflectGetter(charWidthField);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException("Failed to access a value from FontRenderer", e);
-        }
     }
 
     public MinecraftFont() {
@@ -81,9 +69,6 @@ public class MinecraftFont extends MalisisFont {
         try {
             if (fontRenderer == null) throw new IllegalStateException("fontRenderer not initialized");
 
-            if (FMLClientHandler.instance()
-                .hasOptifine()) optifineCharWidth = (float[]) charWidthMethodHandle.invokeExact(fontRenderer);
-            else mcCharWidth = (int[]) charWidthMethodHandle.invokeExact(fontRenderer);
 
             glyphWidth = fontRenderer.glyphWidth;
             unicodePages = fontRenderer.unicodePageLocations;
